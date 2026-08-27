@@ -16,9 +16,11 @@ const CFG = {
   www:    'https://cnc71.pl',
 
   /* --- MASZYNA -------------------------------------------------------------
-     Tabela prędkości cięcia w mm/min dla lasera referencyjnego (~3 kW).
-     Razortek RZ1530FBC 12 kW jest DUŻO szybszy — zamiast przepisywać całą
-     tabelę, podkręć mnożnik `mocFactor`. Kalibracja: wytnij jeden znany detal,
+     Maszyna: Razortek RZ1530FBC, 12 kW, stół 3000 × 1500 mm.
+     Tabela prędkości cięcia w mm/min jest dla lasera referencyjnego ~3 kW.
+     12 kW jest DUŻO szybszy — zamiast przepisywać całą tabelę, podkręć
+     mnożnik `mocFactor`. Zostawiony na 1.0 CELOWO: zaniżona prędkość =
+     zawyżona cena, czyli błąd w bezpieczną stronę do czasu kalibracji. Kalibracja: wytnij jeden znany detal,
      zmierz czas, porównaj z 'Czas cięcia' pokazywanym przez tool.
      ---------------------------------------------------------------------- */
   mocFactor: 1.0,                 // << SKALIBROWAĆ (12 kW vs 3 kW ≈ 1.8–2.5)
@@ -72,6 +74,6 @@ const CFG = {
   /* Minimalna wartość zlecenia netto (przed VAT). 0 = wyłączone. */
   minZlecenie: 150,
 
-  /* Maksymalny detal — format stołu Razortek RZ1530 = 3000 × 1500 mm */
+  /* Maksymalny detal — format stołu Razortek RZ1530FBC = 3000 × 1500 mm */
   maxDetal: {x:3000, y:1500},
 };
