@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CNC71 — wycena cięcia laserem online | DXF bez rejestracji</title>
+<meta name="description" content="Wgraj plik DXF, wybierz materiał i grubość — wycena cięcia laserem w kilka sekund. CNC71, Święta Katarzyna.">
+<style>
+:root{
+  --bg:#0b0d10; --bg2:#12161b; --pan:#161b22; --pan2:#1c222b;
+  --br:#252d38; --br2:#323c4a;
+  --tx:#e6edf3; --tx2:#9aa7b6; --tx3:#5f6b7a;
+  --acc:#ff7a18; --acc2:#ffa552; --ok:#2ea043; --warn:#d29922; --err:#f85149;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font:14px/1.5 -apple-system,'Segoe UI',Roboto,sans-serif;min-height:100vh}
+a{color:var(--acc)}
+header{display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid var(--br);background:var(--bg2);position:sticky;top:0;z-index:20}
+.logo{font-weight:800;font-size:19px;letter-spacing:-.02em}
+.logo span{color:var(--acc)}
+.tag{font-size:11px;color:var(--tx3);letter-spacing:.10em;text-transform:uppercase;padding-top:3px}
+header .sp{flex:1}
+header .hc{font-size:12px;color:var(--tx2)}
+.wrap{display:grid;grid-template-columns:320px 1fr 330px;gap:1px;background:var(--br);min-height:calc(100vh - 53px)}
+.col{background:var(--bg);padding:16px;overflow-y:auto;max-height:calc(100vh - 53px)}
+@media(max-width:1100px){.wrap{grid-template-columns:1fr}.col{max-height:none}}
+h2{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--tx3);margin:0 0 10px;font-weight:700}
+h2:not(:first-child){margin-top:22px}
+.card{background:var(--pan);border:1px solid var(--br);border-radius:10px;padding:14px;margin-bottom:12px}
+.dz{border:2px dashed var(--br2);border-radius:12px;padding:30px 16px;text-align:center;cursor:pointer;transition:.15s;background:var(--pan)}
+.dz:hover,.dz.on{border-color:var(--acc);background:rgba(255,122,24,.06)}
+.dz .ic{font-size:32px;opacity:.55;margin-bottom:8px}
+.dz .t{font-weight:600;margin-bottom:4px}
+.dz .s{font-size:11px;color:var(--tx3)}
+label.f{display:block;font-size:11px;color:var(--tx2);margin:12px 0 5px;font-weight:600}
+select,input[type=number],input[type=text],input[type=email],textarea{
+  width:100%;background:var(--pan2);border:1px solid var(--br2);color:var(--tx);
+  border-radius:7px;padding:9px 10px;font:inherit;font-size:13px}
+select:focus,input:focus,textarea:focus{outline:none;border-color:var(--acc)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cvwrap{position:relative;background:var(--bg2);border:1px solid var(--br);border-radius:10px;height:calc(100vh - 265px);min-height:380px;overflow:hidden}
+canvas{display:block;width:100%;height:100%;cursor:grab}
+canvas.drag{cursor:grabbing}
+.cvtools{position:absolute;top:10px;right:10px;display:flex;gap:6px}
+.cvtools button{background:rgba(22,27,34,.92);border:1px solid var(--br2);color:var(--tx2);width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:15px}
+.cvtools button:hover{color:var(--acc);border-color:var(--acc)}
+.cvhint{position:absolute;left:12px;bottom:10px;font-size:11px;color:var(--tx3)}
+.empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--tx3);gap:8px;pointer-events:none}
+.empty .ic{font-size:44px;opacity:.25}
+.grp{display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:6px;font-size:12px}
+.grp:hover{background:var(--pan2)}
+.grp .sw{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
+.grp .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grp .ct{color:var(--tx3);font-size:11px}
+.grp input{width:auto;margin:0;accent-color:var(--acc)}
+.stat{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;color:var(--tx2)}
+.stat b{color:var(--tx);font-weight:600;font-variant-numeric:tabular-nums}
+.prow{display:flex;justify-content:space-between;font-size:13px;padding:6px 0}
+.prow .l{color:var(--tx2)}
+.prow .v{font-variant-numeric:tabular-nums}
+.pdiv{height:1px;background:var(--br);margin:7px 0}
+.ptot{background:linear-gradient(135deg,rgba(255,122,24,.14),rgba(255,122,24,.05));border:1px solid rgba(255,122,24,.35);border-radius:10px;padding:14px;margin-top:12px;display:flex;justify-content:space-between;align-items:center}
+.ptot .l{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--acc2);font-weight:700}
+.ptot .v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+.btn{display:block;width:100%;background:var(--acc);color:#12161b;border:none;border-radius:8px;padding:12px;font:inherit;font-weight:700;cursor:pointer;margin-top:10px}
+.btn:hover{background:var(--acc2)}
+.btn.sec{background:transparent;border:1px solid var(--br2);color:var(--tx2)}
+.btn.sec:hover{border-color:var(--acc);color:var(--acc);background:transparent}
+.note{font-size:11px;color:var(--tx3);line-height:1.6;margin-top:10px}
+.warnbox{background:rgba(210,153,34,.09);border:1px solid rgba(210,153,34,.3);color:#e3b341;border-radius:8px;padding:9px 11px;font-size:11.5px;line-height:1.55;margin-top:10px}
+.errbox{background:rgba(248,81,73,.09);border:1px solid rgba(248,81,73,.3);color:#ff7b72;border-radius:8px;padding:9px 11px;font-size:11.5px;margin-top:10px}
+.hide{display:none!important}
+footer{padding:16px 22px;border-top:1px solid var(--br);color:var(--tx3);font-size:11.5px;text-align:center}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">CNC<span>71</span></div>
+  <div class="tag">LaserQuote</div>
+  <div class="sp"></div>
+  <div class="hc" id="hc"></div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ LEWA: plik + parametry ============ -->
+  <div class="col">
+    <h2>1 &middot; Plik</h2>
+    <div class="dz" id="dz">
+      <div class="ic">&#11041;</div>
+      <div class="t">Upu&#347;&#263; plik DXF</div>
+      <div class="s">albo kliknij, &#380;eby wybra&#263; &middot; DXF (R12&ndash;2018)</div>
+    </div>
+    <input type="file" id="fi" accept=".dxf" class="hide">
+    <div id="fname" class="note"></div>
+    <div id="ferr"></div>
+
+    <div id="opts" class="hide">
+      <label class="f">Jednostka rysunku</label>
+      <select id="scale">
+        <option value="1">milimetry (mm)</option>
+        <option value="10">centymetry (cm)</option>
+        <option value="25.4">cale (in)</option>
+        <option value="304.8">stopy (ft)</option>
+        <option value="1000">metry (m)</option>
+      </select>
+      <div class="note" id="iuhint"></div>
+
+      <h2>2 &middot; Materia&#322;</h2>
+      <label class="f">Rodzaj blachy</label>
+      <select id="mat"></select>
+      <label class="f">Grubo&#347;&#263; [mm]</label>
+      <select id="thick"></select>
+      <div class="row2">
+        <div><label class="f">Sztuk</label><input type="number" id="qty" value="1" min="1" step="1"></div>
+        <div><label class="f">Termin</label><select id="prio"></select></div>
+      </div>
+
+      <h2>Warstwy</h2>
+      <div id="lyrs" class="card" style="padding:6px"></div>
+      <h2>Typy linii</h2>
+      <div id="lts" class="card" style="padding:6px"></div>
+      <div class="note">Linie osiowe / kreskowe (CENTER, HIDDEN, DASHED&hellip;) s&#261; domy&#347;lnie pomijane &mdash; nie licz&#261; si&#281; do ceny. Odznacz to, czego nie chcesz ci&#261;&#263;.</div>
+    </div>
+  </div>
+
+  <!-- ============ ŚRODEK: podgląd ============ -->
+  <div class="col">
+    <div class="cvwrap">
+      <canvas id="cv"></canvas>
+      <div class="cvtools">
+        <button onclick="zoom(1.25)" title="Powi&#281;ksz">+</button>
+        <button onclick="zoom(.8)" title="Pomniejsz">&minus;</button>
+        <button onclick="fitView()" title="Dopasuj">&#10530;</button>
+      </div>
+      <div class="cvhint" id="cvhint"></div>
+      <div class="empty" id="cvempty"><div class="ic">&#11041;</div><div>Podgl&#261;d geometrii</div></div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <div class="stat"><span>D&#322;ugo&#347;&#263; ci&#281;cia</span><b><span id="s-len">&ndash;</span> mm</b></div>
+      <div class="stat"><span>Liczba przebi&#263; (kontur&oacute;w)</span><b id="s-con">&ndash;</b></div>
+      <div class="stat"><span>Gabaryt detalu</span><b id="s-dim">&ndash;</b></div>
+      <div class="stat"><span>Czas ci&#281;cia (1 szt.)</span><b id="s-time">&ndash;</b></div>
+      <div class="stat"><span>Masa detalu (1 szt.)</span><b id="s-kg">&ndash;</b></div>
+      <div class="stat"><span>Elementy pomini&#281;te</span><b id="s-ex">&ndash;</b></div>
+    </div>
+  </div>
+
+  <!-- ============ PRAWA: wycena ============ -->
+  <div class="col">
+    <h2>3 &middot; Wycena</h2>
+    <div class="card">
+      <div id="pbox"><div class="note">Wgraj plik, &#380;eby zobaczy&#263; wycen&#281;.</div></div>
+      <div class="ptot hide" id="ptot">
+        <div class="l" id="ptot-l">Razem</div>
+        <div class="v" id="ptot-v">&ndash; PLN</div>
+      </div>
+      <div id="pwarn"></div>
+      <div class="note hide" id="pnote">
+        Ceny brutto (VAT 23%). Wycena automatyczna na podstawie geometrii &mdash;
+        nie uwzgl&#281;dnia gi&#281;cia, gratowania ani obr&oacute;bki po ci&#281;ciu.
+        Przy nietypowych detalach cen&#281; potwierdzamy mailem.
+      </div>
+    </div>
+
+    <div id="inqbox" class="hide">
+      <h2>4 &middot; Zapytanie</h2>
+      <div class="card">
+        <label class="f">Imi&#281; i nazwisko / firma</label><input type="text" id="q-name">
+        <label class="f">E-mail</label><input type="email" id="q-mail">
+        <label class="f">Telefon</label><input type="text" id="q-tel">
+        <label class="f">Uwagi (gi&#281;cie, tolerancje, termin&hellip;)</label><textarea id="q-msg" rows="3"></textarea>
+        <button class="btn" id="btn-mail">Wy&#347;lij zapytanie mailem</button>
+        <button class="btn sec" id="btn-copy">Skopiuj specyfikacj&#281; do schowka</button>
+        <div class="note">Plik DXF do&#322;&#261;cz r&#281;cznie do maila &mdash; przegl&#261;darka nie mo&#380;e zrobi&#263; tego za Ciebie.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer id="ft"></footer>
+
+<script src="cennik.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
