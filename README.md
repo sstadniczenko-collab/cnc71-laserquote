@@ -26,7 +26,7 @@ Rzeczy, które robi ten tool, a które łatwo przeoczyć:
 - **pomija linie osiowe i kreskowe** (CENTER, HIDDEN, DASHED, PHANTOM…) — nie liczą się do ceny,
 - pozwala ręcznie odznaczyć dowolną warstwę / typ linii (np. opis, wymiarowanie),
 - liczy przebicia przez sklejanie encji po końcach (union-find, tolerancja 0,02 j.),
-- ostrzega: detal większy niż stół 3000×1500, detal < 20 mm (mikrozłącza), poniżej minimum zlecenia,
+- ostrzega: detal większy niż stół 3000×1500 (format RZ1530FBC), detal < 20 mm (mikrozłącza), poniżej minimum zlecenia,
 - masa detalu z gabarytu × grubość × gęstość (bez nestingu — czyli **z zapasem**, jak u konkurencji).
 
 ## Kalibracja — [`cennik.js`](cennik.js)
@@ -35,7 +35,7 @@ To jedyny plik do zmiany. Wartości, które **trzeba** przestawić przed startem
 
 | Pole | Teraz | Co z tym zrobić |
 |---|---|---|
-| `mocFactor` | `1.0` | Tabela prędkości jest dla lasera ~3 kW. Razortek 12 kW ≈ **1.8–2.5**. Wytnij znany detal, zmierz czas, porównaj z „Czas cięcia" w toolu. |
+| `mocFactor` | `1.0` | Tabela prędkości jest dla lasera ~3 kW, tniemy na **Razortek RZ1530FBC 12 kW** → realnie ok. **1.8–2.5**. Zostawione na 1.0 celowo: zaniżona prędkość zawyża cenę, czyli myli się w bezpieczną stronę. Kalibracja: wytnij znany detal, zmierz czas stoperem, porównaj z polem „Czas cięcia" i podziel. |
 | `materialy[*].plnKg` | ceny orientacyjne | Wstawić realne ceny zakupu blachy /kg. |
 | `machMin` | `3.50` zł/min | Maszynogodzina / 60 (amortyzacja + serwis + obsługa). |
 | `elecMin` | `0.30` zł/min | Pobór (laser + chiller + odciąg) × stawka za kWh / 60. |
@@ -56,6 +56,16 @@ node test/smoke.mjs
 Parsuje `test/plytka.dxf` (prostokąt 100×50 + otwór Ø20 + linia osiowa do pominięcia)
 i sprawdza długość cięcia, liczbę przebić, gabaryt i masę. Bez przeglądarki —
 `app.js` jest ładowany w `vm` na atrapach DOM.
+
+## Live
+
+**https://sstadniczenko-collab.github.io/cnc71-laserquote/**
+
+Repo jest **publiczne** — tego wymaga GitHub Pages na darmowym planie. Dla
+poufności stawek nie zmienia to praktycznie nic: skoro wycena liczy się w
+przeglądarce klienta, zawartość `cennik.js` i tak trafia do niego i widać ją w
+devtools — dokładnie jak u konkurencji. Jedyny sposób, żeby stawki zostały
+nieujawnione, to własny backend liczący cenę po stronie serwera.
 
 ## Uruchomienie lokalnie
 
